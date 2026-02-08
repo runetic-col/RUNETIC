@@ -1,0 +1,70 @@
+{
+  "summary": "Verified WOMPI PSE payment flow fix for 'Token de aceptación ya fue usado' error. All 9 backend tests passed (100%). Frontend UI verified - PaymentResult page shows retry button for declined status, hides it for approved status.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_wompi_pse_flow.py",
+    "/app/test_reports/pytest/pytest_wompi_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_wompi_pse_flow.py"
+  ],
+  "success_rate": {
+    "backend": "100% (9/9 tests passed)",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "admin": {"username": "Runetic.col", "password": "1022378240RUNETICSA"}
+  },
+  "seed_data_creation": "Created test payment attempts with unique references",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "WOMPI PSE payment flow fix verified. Key features tested: 1) WOMPI config returns PRODUCTION key (pub_prod_ZYEmuh53kkm4KCXQyfarBXyoA53htiRW), 2) POST /api/payments/wompi/register-attempt creates unique payment attempt and rejects duplicates, 3) GET /api/payments/verify/{reference} returns payment status, 4) PaymentResult page shows 'Intentar Pago Nuevamente' button for declined status, 5) PaymentResult page hides retry button for approved status, 6) Checkout generates unique reference using timestamp+random pattern (RUNETIC-{timestamp}-{random})",
+  "verified_features": {
+    "wompi_production_key": {
+      "status": "PASS",
+      "details": "WOMPI config API returns production key: pub_prod_ZYEmuh53kkm4KCXQyfarBXyoA53htiRW"
+    },
+    "register_payment_attempt": {
+      "status": "PASS",
+      "details": "POST /api/payments/wompi/register-attempt creates unique payment attempt with reference, order_id, amount_in_cents, session_id"
+    },
+    "duplicate_reference_rejection": {
+      "status": "PASS",
+      "details": "Second attempt with same reference returns 400 error: 'Esta referencia de pago ya fue utilizada. Por favor inicie un nuevo pago.'"
+    },
+    "payment_verification": {
+      "status": "PASS",
+      "details": "GET /api/payments/verify/{reference} returns status (INITIATED/PENDING for new payments)"
+    },
+    "payment_result_declined_retry_button": {
+      "status": "PASS",
+      "details": "PaymentResult page with status=declined shows 'Intentar Pago Nuevamente' button with data-testid='retry-payment-btn'"
+    },
+    "payment_result_approved_no_retry": {
+      "status": "PASS",
+      "details": "PaymentResult page with status=approved does NOT show retry button (correct behavior)"
+    },
+    "unique_reference_generation": {
+      "status": "PASS",
+      "details": "Checkout.js generates unique reference using pattern: RUNETIC-{timestamp}-{random8chars}"
+    },
+    "checkout_button_disable": {
+      "status": "PASS (code review)",
+      "details": "Checkout.js has paymentInProgress state that disables button immediately on click (line 193-194: setLoading(true); setPaymentInProgress(true);)"
+    },
+    "retry_navigation": {
+      "status": "PASS (code review)",
+      "details": "PaymentResult.js handleRetry navigates to /checkout?retry={timestamp} for fresh checkout session"
+    }
+  }
+}
