@@ -1,41 +1,24 @@
 version: '3.8'
-
 services:
-  mongodb:
-    image: mongo:6
-    container_name: runetic-db
+  mongo:
+    image: mongo:latest
+    container_name: mongo
     ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_DATABASE: runetic_db
+      - '27017:27017'
     volumes:
-      - mongo_data:/data/db
-    command: mongod --bind_ip 0.0.0.0
-    restart: unless-stopped
+      - mongo-data:/data/db
 
   backend:
-    build: .
-    container_name: runetic-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
     ports:
-      - "8000:8000"
+      - '5000:5000'
     environment:
-      MONGO_URL: mongodb://mongodb:27017
-      DB_NAME: runetic_db
-      SECRET_KEY: ${SECRET_KEY}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      MAYORISTA_PASSWORD: ${MAYORISTA_PASSWORD}
-      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
-      WOMPI_PUBLIC_KEY: ${WOMPI_PUBLIC_KEY}
-      WOMPI_PRIVATE_KEY: ${WOMPI_PRIVATE_KEY}
-      WOMPI_INTEGRITY_SECRET: ${WOMPI_INTEGRITY_SECRET}
-      CORS_ORIGINS: "*"
+      - MONGO_URI=mongodb://mongo:27017/mydatabase
     depends_on:
-      - mongodb
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/products"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - mongo
+
+volumes:
+  mongo-data:
